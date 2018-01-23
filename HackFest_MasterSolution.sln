@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Management", "WebApp\Management.csproj", "{037C568E-ED22-431A-998F-C228C414FFCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Management", "WebApp\Management.csproj", "{037C568E-ED22-431A-998F-C228C414FFCC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sites", "Sites", "{037F4D67-E806-483A-BC7D-89056F0F5A88}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Devices", "Devices", "{399A0EF3-1413-4FD1-9906-BC9DBFAF98E1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MxChip", "MxChip", "{67EE3842-9F9D-4EC0-8EAD-F5D5C1FF11D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{AC3CD801-66BB-485A-ABDB-FD02DC66E713}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +29,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{037C568E-ED22-431A-998F-C228C414FFCC} = {037F4D67-E806-483A-BC7D-89056F0F5A88}
+		{67EE3842-9F9D-4EC0-8EAD-F5D5C1FF11D9} = {399A0EF3-1413-4FD1-9906-BC9DBFAF98E1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {694241E7-DDFE-4935-BC5C-DABA3769CD70}
