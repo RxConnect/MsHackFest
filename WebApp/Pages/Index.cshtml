@@ -106,3 +106,15 @@
         </ul>
     </div>
 </div>
+
+<script src="scripts/signalr-client.min.js"></script>
+<script lang="javascript">
+    let connection = new signalR.HubConnection('/doors');
+
+    connection.on('send', data => {
+        console.log(data);
+    });
+
+    connection.start()
+            .then(() => connection.invoke('send', 'Hello'));
+</script>

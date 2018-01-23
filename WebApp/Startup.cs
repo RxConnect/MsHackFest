@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace WebApp
 {
+    using Hubs;
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -22,6 +23,7 @@ namespace WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +46,11 @@ namespace WebApp
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
+            });
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<Doors>("doors");
             });
         }
     }
