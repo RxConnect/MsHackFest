@@ -20,7 +20,6 @@ namespace OpenDoors_Xforms.UWP
         public MainPage()
         {
             this.InitializeComponent();
-
             LoadApplication(new OpenDoors_Xforms.App());
         }
     }

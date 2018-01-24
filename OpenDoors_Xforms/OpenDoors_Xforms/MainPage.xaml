@@ -3,9 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:OpenDoors_Xforms"
              x:Class="OpenDoors_Xforms.MainPage">
-
-	<Label Text="Welcome to Xamarin.Forms!" 
-           VerticalOptions="Center" 
-           HorizontalOptions="Center" />
-
+    <Grid>
+        <Label Text="JCM-Door Opener" VerticalOptions="Start" HorizontalOptions="Center" />
+        <Grid Margin="40,40,40,40">
+            <Button x:Name="btnOpen" Text="Open" VerticalOptions="StartAndExpand"/>
+        </Grid>
+        <Grid Margin="40,80,40,40">
+            <Button x:Name="btnStop" Text="Stop" VerticalOptions="StartAndExpand"/>
+        </Grid>
+        <Grid Margin="40,120,40,40">
+            <Button x:Name="btnClose" Text="Close" VerticalOptions="StartAndExpand"/>
+        </Grid>
+    </Grid>
 </ContentPage>

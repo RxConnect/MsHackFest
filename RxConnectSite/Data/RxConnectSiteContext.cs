@@ -15,10 +15,13 @@ namespace RxConnectSite.Data
         }
 
         public DbSet<RxConnectSite.Models.Fobs> Fobs { get; set; }
-
+        public DbSet<RxConnectSite.Models.Notifications> Notifications { get; set; }
+        public DbSet<RxConnectSite.Models.Subscribers> Subscribers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Fobs>().ToTable("Fobs");
+            modelBuilder.Entity<Notifications>().ToTable("Notifications");
+            modelBuilder.Entity<Subscribers>().ToTable("Subscribers");
         }
     }
 }

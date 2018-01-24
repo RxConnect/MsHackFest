@@ -23,9 +23,11 @@ namespace RxConnectSite.Controllers
 
         // GET: api/Fobs
         [HttpGet]
-        public IEnumerable<string> GetFobs()
+        public IQueryable<Fobs> GetFobs()
         {
-            return new string[] { _context.Fobs.First().Command.ToString() };
+            _context.Fobs.Add(new Fobs() { Command = CommandType.Activation, DeviceNumber = "1234567" });
+            _context.SaveChanges();
+            return _context.Fobs;
         }
 
         // GET: api/Fobs/5
