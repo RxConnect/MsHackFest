@@ -25,12 +25,20 @@
   .c3 .c3-axis-x path { stroke: #afb9c3; }
 
   .pause-button {
+    padding:2px !important;
     text-transform: capitalize;
     padding-top: 5px;
     padding-bottom: 5px;
-    background-color: #353535;
+    background-color: white;
+    color: orange;
+    border-radius: 3px;
+    border: 1px solid orange;
 
-    &:hover { background-color: #545454; }
+    &:hover { 
+      padding:2px !important;
+      background-color: orange; 
+      color: white;
+    }
   }
 
   .telemetry-btn-group {
