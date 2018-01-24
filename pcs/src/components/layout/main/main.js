@@ -6,8 +6,9 @@ import { bindActionCreators } from 'redux';
 import * as actions from '../../../actions';
 import LeftNav from '../leftNav/leftNav.js';
 import Flyout from '../../flyout/flyout';
-import PcsModal from '../../shared/pcsModal/pcsModal';
 import lang from '../../../common/lang';
+
+import BlueShieldSvg from '../../../assets/icons/BlueShield.svg';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
@@ -24,12 +25,13 @@ class Main extends Component {
     // On the first page load, open a modal to direct the user to more information
     this.props.actions.showModal(
       lang.PREVIEWNOTICE,
-      'https://github.com/Azure/azure-iot-pcs-remote-monitoring-dotnet/blob/master/README.md'
+      'https://github.com/Azure/azure-iot-pcs-remote-monitoring-dotnet/blob/master/README.md',
+      BlueShieldSvg
     );
   }
 
   render() {
-    const { flyout, actions, modal } = this.props;
+    const { flyout, actions } = this.props;
     const flyoutProp = {
       show: flyout.show,
       onClose: (flyout.content && flyout.content.onClose) ? flyout.content.onClose : actions.hideFlyout,
@@ -43,14 +45,14 @@ class Main extends Component {
           {this.props.children}
         </div>
         <Flyout {...flyoutProp} />
-     
+      
       </div>
     );
   }
 }
 
 const mapStateToProps = state => {
-  return {
+  return { 
     flyout: state.flyoutReducer,
     modal: state.modalReducer
   };
