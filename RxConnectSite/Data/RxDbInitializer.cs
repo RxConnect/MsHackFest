@@ -17,9 +17,6 @@ namespace RxConnectSite.Data
                 //db already initialized
                 return;
             }
-
-            dbContext.Fobs.Add(new Fobs() { Command = CommandType.Activation, DeviceNumber = "12345" });
-            dbContext.SaveChanges();
         }
     }
 }
