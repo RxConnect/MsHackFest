@@ -92,7 +92,7 @@ class DashboardPage extends Component {
       timeRange: this.state.timeRange
     };
 
-    const devicesList = this.props.devices && this.props.devices.Items ? this.props.devices.Items : [];
+    const devicesList = this.props.devices && this.props.devices.items ? this.props.devices.items : [];
     const devices = devicesList.map(({ Id }) => Id)
     const alarmListProps = {
       devices,
@@ -140,11 +140,10 @@ class DashboardPage extends Component {
       <PageContainer>
         <TopNav breadcrumbs={'Dashboard'} projectName={lang.AZUREPROJECTNAME} />
         <ContextFilters>
-          <div className="timerange-selection dashboard" onClick={this.props.actions.hideFlyout}>
+          <div className="timerange-selection dashboard">
             <div className="last-refreshed-text"> {`${lang.LAST_REFRESHED} | `} </div>
             <div className="last-refreshed-time">{this.state.lastRefreshed.toLocaleString()}</div>
             <div onClick={this.refreshData} className="refresh-icon icon-sm" />
-            <div className="time-icon icon-sm" />
             <Select {...selectProps} />
           </div>
           <ManageFilterBtn />
@@ -183,9 +182,7 @@ const mapStateToProps = state => {
     alarmListLastDuration: state.kpiReducer.alarmListLastDuration,
     alarmsByRule: state.kpiReducer.alarmsByRule,
     alarmsByRuleLastDuration: state.kpiReducer.alarmsByRuleLastDuration,
-    rulesAndActions: state.ruleReducer.rulesAndActions,
-    flyout: state.flyoutReducer,
-    modal: state.modalReducer
+    rulesAndActions: state.ruleReducer.rulesAndActions
   };
 };
 

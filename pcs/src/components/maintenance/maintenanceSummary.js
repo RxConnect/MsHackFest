@@ -29,7 +29,7 @@ const MaintenanceSummary = ({ alarms, jobs, selectedGrid = 'alarms' }) => {
   const systemSelected = selectedGrid === 'alarms' ? '' : 'system-';
   return (<div className="summary-container">
           <div className="summary-header">
-            {lang.MAINTENANCE}
+            {lang.MAINTENANCE_SUMMARY}
           </div>
           <div className="summary-body">
             <div className={`${alarmSelected}score-board`}>
@@ -37,29 +37,25 @@ const MaintenanceSummary = ({ alarms, jobs, selectedGrid = 'alarms' }) => {
               <div className="score-label">{lang.OPEN_ALARMS}</div>
               <div className="score-board-details">
                 <div className="details-content">
-                  <img src={Critical} {...iconStyle} alt={Critical} />
-                  <span className="alarm-count">{alarms.critical}</span>
-                  <span className="alarm-text">{lang.CRITICAL}</span>
+                  <img src={Critical} {...iconStyle} alt={`${Critical}`} />
+                  {`${alarms.critical} ${lang.CRITICAL}`}
                 </div>
                 <div className="details-content">
-                  <img src={Warning} {...iconStyle} alt={Warning} />
-                  <span className="alarm-count">{alarms.warning}</span>
-                  <span className="alarm-text">{lang.WARNING}</span>
+                  <img src={Warning} {...iconStyle} alt={`${Warning}`} />
+                  {`${alarms.warning} ${lang.WARNING}`}
                 </div>
               </div>
             </div>
             <div className={`${systemSelected}score-board`}>
-              <img src={InfoFailed} className="info-failed" alt={InfoFailed} />
+              <img src={InfoFailed} className="info-failed" alt={`${InfoFailed}`} />
               <div className="score">{jobs.failed}</div>
               <div className="score-label">{lang.FAILED_JOBS}</div>
               <div className="score-board-details">
                 <div className="details-content">
-                  <span className="job-count">{jobs.total}</span>
-                  <span className="job-text">{lang.TOTAL}</span>
+                  {`${jobs.total} ${lang.TOTAL}`}
                 </div>
                 <div className="details-content">
-                  <span className="job-count">{jobs.succeeded}</span>
-                  <span className="job-text">{lang.SUCCEEDED}</span>
+                  {`${jobs.succeeded} ${lang.SUCCEEDED}`}
                 </div>
               </div>
             </div>

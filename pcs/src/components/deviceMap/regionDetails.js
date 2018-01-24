@@ -16,19 +16,19 @@ class RegionDetails extends Component {
       totalWarningsDeviceCount: 0
     };
     if (this.props.devices) {
-      regionDetailsProps.onlineDevicesCount = this.props.devices.Items.filter(item => {
+      regionDetailsProps.onlineDevicesCount = this.props.devices.items.filter(item => {
         return item.Connected;
       }).length;
-      regionDetailsProps.offlineDevicesCount = this.props.devices.Items.filter(item => {
+      regionDetailsProps.offlineDevicesCount = this.props.devices.items.filter(item => {
         return !item.Connected;
       }).length;
     }
     if (this.props.alarmList) {
       regionDetailsProps.totalAlarmDeviceCount = this.props.alarmList.filter(item => {
-        return item.Rule.Severity === Config.STATUS_CODES.CRITICAL && item.Status === Config.STATUS_CODES.OPEN;
+        return item.Rule.Severity === Config.STATUS_CODES.CRITICAL;
       }).length;
       regionDetailsProps.totalWarningsDeviceCount = this.props.alarmList.filter(item => {
-        return item.Rule.Severity === Config.STATUS_CODES.WARNING && item.Status === Config.STATUS_CODES.OPEN;
+        return item.Rule.Severity === Config.STATUS_CODES.WARNING;
       }).length;
     }
 

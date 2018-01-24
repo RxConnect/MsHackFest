@@ -2,11 +2,10 @@
 
 .timerange-selection.dashboard {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 13px;
-  margin-right: 10px;
+  align-items: center;
+  margin-top: 4px;
 
-  .Select-control { margin-top: 10px; }
+  .Select-control { margin-top: 18px; }
 
   .Select-value-label,
   .Select-arrow-zone { color: #fff; }
@@ -31,12 +30,6 @@
     margin-left: 10px;
     margin-right: 6px;
     color: #afb9c3;
-  }
-
-  .time-icon {
-    background: url("../../../assets/icons/Timerange.svg") no-repeat center;
-    background-size: contain;
-    margin-left: 35px !important;
   }
 
   .refresh-icon {

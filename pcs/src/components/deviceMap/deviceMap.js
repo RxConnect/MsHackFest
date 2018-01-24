@@ -53,7 +53,7 @@ class DeviceMap extends Component {
     if (!devices || !telemetryByDeviceGroup || !alarmList)  return;
 
     //If control reaches here, that means map is loaded and also the data is also loaded.
-    devices.Items.forEach(device => {
+    devices.items.forEach(device => {
       telemetryByDeviceGroup.Items.forEach(telemetryGroup => {
         /**
         Bing Map renders the devices only if the devices have longitude and latitude.
@@ -75,18 +75,18 @@ class DeviceMap extends Component {
       });
 
       alarmList.forEach(alarm => {
-        if (device.Id === alarm.DeviceId && alarm.Status === config.STATUS_CODES.OPEN) {
+        if (device.Id === alarm.DeviceId) {
           device.Severity = alarm.Rule.Severity;
         }
       });
     });
     MapPane.setData({
       BingMapKey: props.BingMapKey,
-      deviceData: devices.Items,
+      deviceData: devices.items,
       container: this,
       actions
     });
-    let data = this.getDeviceData(devices.Items);
+    let data = this.getDeviceData(devices.items);
     MapPane.setDeviceLocationData(
       data.minLat,
       data.minLong,

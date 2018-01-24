@@ -26,7 +26,6 @@ const Config = {
   VERSION: '1.0.0-preview.4',
   STATUS_CODES: {
     CRITICAL: 'critical',
-    OPEN: 'open',
     WARNING: 'warning',
     EQ: '= Equals',
     GT: '> Greater than',

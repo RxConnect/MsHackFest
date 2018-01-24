@@ -30,11 +30,7 @@ class Drawer extends Component {
       <div className="drawer-wrapper">
         <div className="drawer-header" onClick={this.toggleHeader}>
           {this.props.title}
-          {
-            this.state.showContent
-              ? <img src={ChevronIcon} className="chevron-close" alt="Up Arrow" />
-              : <img src={ChevronIcon} className="chevron-open" alt="Down Arrow" />
-          }
+          <img src={ChevronIcon} className="chevron-open" alt="ChevronIcon" />
         </div>
         <div style={displayContent}>
           {description}
