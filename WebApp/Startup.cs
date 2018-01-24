@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace WebApp
 {
+    
     using Hubs;
     public class Startup
     {
