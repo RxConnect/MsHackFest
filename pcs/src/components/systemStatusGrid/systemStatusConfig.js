@@ -24,7 +24,7 @@ const getStatusCode = value => {
 export const systemStatusColumnDefs = {
   jobId: {
     headerName: lang.JOBNAME,
-    field: 'JobId'
+    field: 'jobId'
   },
   deviceIdAffected: {
     headerName: lang.DEVICE_ID_AFFECTED,
@@ -32,24 +32,24 @@ export const systemStatusColumnDefs = {
   },
   status: {
     headerName: lang.STATUS,
-    field: 'Status',
+    field: 'status',
     valueFormatter: ({ value }) => getStatusCode(value)
   },
   lastReturnMessage: {
     headerName: lang.LAST_RETURN_MESSAGE,
-    field: 'Status',
+    field: 'status',
     valueFormatter: ({ value, data }) => {
        return `${data.methodName} ${getStatusCode(value)}`;
     }
   },
   type: {
     headerName: lang.OPERATION,
-    field: 'Type',
+    field: 'type',
     valueFormatter: ({ value, data }) => {
       if (value === 3) {
-        return data.MethodParameter && data.MethodParameter.Name;
+        return data.methodParameter && data.methodParameter.name;
       } else if (value === 4) {
-        if (data.UpdateTwin && data.UpdateTwin.Tags && Object.keys(data.UpdateTwin.Tags).length) {
+        if (data.updateTwin && data.updateTwin.tags && Object.keys(data.updateTwin.tags).length) {
           return lang.TAG;
         } else {
           return lang.RECONFIGURE;
@@ -60,22 +60,22 @@ export const systemStatusColumnDefs = {
   },
   deviceCount: {
     headerName: lang.NO_OF_DEVICES,
-    field: 'ResultStatistics.DeviceCount',
+    field: 'resultStatistics.deviceCount',
     valueFormatter: ({ value }) => checkForEmpty(value, 0)
   },
   succeededCount: {
     headerName: lang.SUCCEEDED_CAPITAL,
-    field: 'ResultStatistics.SucceededCount',
+    field: 'resultStatistics.succeededCount',
     valueFormatter: ({ value }) => checkForEmpty(value, 0)
   },
   failedCount: {
     headerName: lang.FAILED_CAPITAL,
-    field: 'ResultStatistics.FailedCount',
+    field: 'resultStatistics.failedCount',
     valueFormatter: ({ value }) => checkForEmpty(value, 0)
   },
   startTime: {
     headerName: lang.START_TIME,
-    field: 'StartTimeUtc',
+    field: 'startTimeUtc',
     valueFormatter: ({ value }) => {
       if (!value) return EMPTY_FIELD_VAL;
       const time = moment.utc(value);
@@ -84,7 +84,7 @@ export const systemStatusColumnDefs = {
   },
   endTime: {
     headerName: lang.END_TIME,
-    field: 'EndTimeUtc',
+    field: 'endTimeUtc',
     valueFormatter: ({ value }) => {
       if (!value) return EMPTY_FIELD_VAL;
       const time = moment.utc(value);

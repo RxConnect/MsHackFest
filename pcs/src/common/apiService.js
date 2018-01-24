@@ -200,7 +200,7 @@ class ApiService {
     const escapedId = encodeURIComponent(device.Id);
     const data = {
       Id: device.Id,
-      ETag: device.ETag,
+      Etag: device.Etag,
       tags: {
         ...device.tags,
         ...newTagValueMap

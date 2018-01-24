@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/WebApp/Management.csproj"
+                "${workspaceFolder}/RxConnectSite/RxConnectSite.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

@@ -23,13 +23,12 @@ class DeviceScheduleFlyout extends React.Component {
     this.state = {
       methodValue: '',
       jobInputValue: '',
-      firmwareVersionValue: '',
       firmwareURIValue: '',
       showJobContent: false,
       showFirmwareContent: false,
       showSpinner: false,
       jobApplied: false,
-      JobId: ''
+      jobId: ''
     };
 
     this.getAvailableMethods = this.getAvailableMethods.bind(this);
@@ -55,7 +54,6 @@ class DeviceScheduleFlyout extends React.Component {
       methodValue: value,
       showJobContent: !!value,
       showFirmwareContent: value === lang.FIRMWARE_OPTION,
-      firmwareVersionValue: '',
       firmwareURIValue: ''
     };
     if (!newState.showJobContent) {
@@ -77,28 +75,20 @@ class DeviceScheduleFlyout extends React.Component {
   onConfirm() {
     const deviceIds = this.props.devices
       .map(({ Id }) => `'${Id}'`).join(',');
-
-    const jobParameters = {};
-    if (this.state.showFirmwareContent) {
-      jobParameters["Firmware"] = this.state.firmwareVersionValue;
-      jobParameters["FirmwareUri"] = this.state.firmwareURIValue;
-    }
-
     const payload = {
       JobId: this.state.jobInputValue ? this.state.jobInputValue + '-' + uuid(): uuid(),
       QueryCondition: `deviceId in [${deviceIds}]`,
       MaxExecutionTimeInSeconds: 0,
       MethodParameter: {
-        Name: this.state.methodValue,
-        JsonPayload: JSON.stringify(jobParameters)
+        Name: this.state.methodValue
       }
     };
     this.setState({ showSpinner: true });
-    ApiService.scheduleJobs(payload).then(({ JobId }) => {
+    ApiService.scheduleJobs(payload).then(({ jobId }) => {
       this.setState({
         showSpinner: false,
         jobApplied: true,
-        JobId
+        jobId
       })
     });
   }
@@ -106,7 +96,7 @@ class DeviceScheduleFlyout extends React.Component {
   render() {
     const { devices } = this.props;
     const deepLinkSectionProps = {
-      path: `/maintenance/job/${this.state.JobId}`,
+      path: `/maintenance/job/${this.state.jobId}`,
       description: lang.VIEW_JOB_STATUS,
       linkText: lang.VIEW
     };
@@ -160,18 +150,7 @@ class DeviceScheduleFlyout extends React.Component {
                     {lang.JOB_NAME_REFERENCE}
                   </div>
                   {this.state.showFirmwareContent &&
-                    <div className="firmware-input-section">
-                      <div className="content-title">
-                        {lang.FIRMWAREVERSION}
-                      </div>
-                      <input
-                        className="user-input"
-                        name="firmwareVersionValue"
-                        placeholder={`${lang.FIRMWARE_VERSION_INPUT_PLACEHOLDER}...`}
-                        type="text"
-                        onChange={this.onChangeInput}
-                        value={this.state.firmwareVersionValue}
-                      />
+                    <div className="firmware-uri-section">
                       <div className="content-title">
                         {lang.FIRMWARE_URL}
                       </div>

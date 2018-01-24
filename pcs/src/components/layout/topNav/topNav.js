@@ -34,7 +34,6 @@ class TopNav extends Component {
     return (
       <div className="top-nav">
         <div className="breadcrumbs">
-         
         </div>
         <div className="project-name">
           {this.props.projectName || ''}

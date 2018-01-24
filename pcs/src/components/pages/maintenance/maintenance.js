@@ -87,7 +87,7 @@ class MaintenancePage extends Component {
   }
 
   componentDidMount() {
-    const deviceIds = ((this.props.devices || {}).Items || []).map(({Id}) => Id) || [];
+    const deviceIds = ((this.props.devices || {}).items || []).map(({Id}) => Id) || [];
     this.props.actions.loadMaintenanceData({
       from: `NOW-${this.state.timerange}`,
       to: 'NOW',
@@ -102,7 +102,7 @@ class MaintenancePage extends Component {
   }
 
   refreshData() {
-    const deviceIds = ((this.props.devices || {}).Items || []).map(({Id}) => Id) || [];
+    const deviceIds = ((this.props.devices || {}).items || []).map(({Id}) => Id) || [];
     this.props.actions.loadMaintenanceData({
       from: `NOW-${this.state.timerange}`,
       to: 'NOW',
@@ -252,10 +252,9 @@ class MaintenancePage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { devices, params } = nextProps;
-    if (!params.id && !params.JobId) this.setState({ contextBtns: true });
-    if (devices && devices.Items.length && !_.isEqual(devices, this.props.devices)) {
-      const deviceIds = devices.Items.map(({Id}) => Id);
+    const { devices } = nextProps;
+    if (devices && devices.items.length && !_.isEqual(devices, this.props.devices)) {
+      const deviceIds = devices.items.map(({Id}) => Id);
       this.props.actions.loadMaintenanceData({
         from: `NOW-${this.state.timerange}`,
         to: 'NOW',
@@ -267,19 +266,19 @@ class MaintenancePage extends Component {
 
   // Retrieving the deviceIds from "queryCondition": "deviceId in ['Simulated.prototype-01.0','Simulated.prototype-01.1']".
   selectJobAndSetState(props) {
-    if (!props.params || !props.params.JobId) {
+    if (!props.params || !props.params.jobId) {
       return;
     }
-    ApiService.getJobStatus(props.params.JobId)
+    ApiService.getJobStatus(props.params.jobId)
       .then(jobDetails => {
         const { Devices } = jobDetails;
         const systemStatusDetailsDevices = Devices.map(device => ({
           deviceId: device.DeviceId,
-          StartTimeUtc: device.StartTimeUtc,
-          Status: device.Status,
-          EndTimeUtc: device.EndTimeUtc,
-          JobId: jobDetails.JobId,
-          methodName: (jobDetails.MethodParameter || {}).Name || ''
+          startTimeUtc: device.StartTimeUtc,
+          status: device.Status,
+          endTimeUtc: device.EndTimeUtc,
+          jobId: jobDetails.jobId,
+          methodName: (jobDetails.methodParameter || {}).name || ''
         }));
         this.setState({ systemStatusDetailsDevices, jobDetails });
       });
@@ -288,8 +287,8 @@ class MaintenancePage extends Component {
   onDeviceJobSoftSelectChange({deviceId}) {
     const selectedDeviceIdInJob = deviceId;
     let deviceJob;
-    if (!this.props.devices || !this.props.devices.Items) { return false; }
-    this.props.devices.Items.some(device => {
+    if (!this.props.devices || !this.props.devices.items) { return false; }
+    this.props.devices.items.some(device => {
       if (device.Id === selectedDeviceIdInJob) {
         deviceJob = device;
         return true;
@@ -327,13 +326,13 @@ class MaintenancePage extends Component {
       onDeviceGridReady: this.onDeviceGridReady,
       onAlarmGridReady: this.onAlarmGridReady,
       onRuleGridReady: this.onRuleGridReady,
-      onContextMenuChange: this.onContextMenuChange,
-      onDeviceJobSoftSelectChange : this.onDeviceJobSoftSelectChange
+      onContextMenuChange: this.onContextMenuChange
     };
   };
 
 // --- Grid events handler ends here ----------------------------------
   render() {
+    console.log(this.props, 'props needeed');
     let breadcrumbs;
     const pathName = this.props.location.pathname;
     const alarmsGridData = this.props.alarmsGridData;
@@ -346,14 +345,14 @@ class MaintenancePage extends Component {
     });
       breadcrumbs = <span>{parentLink} <img src={ChevronRight} alt="ChevronRight" className="chevron-right" /> {this.props.params.name}</span>;
     } else if (pathName.indexOf('/job/') > 0) {
-      breadcrumbs = <span>{parentLink} <img src={ChevronRight} alt="ChevronRight" className="chevron-right" />{this.props.params.JobId}</span>;
+      breadcrumbs = <span>{parentLink} <img src={ChevronRight} alt="ChevronRight" className="chevron-right" />{this.props.params.jobId}</span>;
     } else {
       breadcrumbs = lang.MAINTENANCE;
     }
     const pcsBtn = (props, visible = true) => visible ? <PcsBtn {...props} /> : '';
     const showContextBtns = this.state.contextBtns === '';
     const showActionBtns = this.state.selectedRulesActions.length > 0;
-    const devicesList = this.props.devices && this.props.devices.Items ? this.props.devices.Items : [];
+    const devicesList = this.props.devices && this.props.devices.items ? this.props.devices.items : [];
     const alarmListProps = {
       alarms: (this.props.alarmsGridData || [])
         .map(row => row[row.Rule.Id])
@@ -373,12 +372,21 @@ class MaintenancePage extends Component {
     return (
       <PageContainer>
         <TopNav breadcrumbs={breadcrumbs} projectName={lang.AZUREPROJECTNAME} />
-        <ContextFilters disableDeviceFilter={((this.props.params || {}).id || (this.props.params || {}).JobId) !== undefined}>
-          <div className="timerange-selection" onClick={this.props.actions.hideFlyout}>
-            <span className="last-refreshed-text"> {`${lang.LAST_REFRESHED} | `} </span>
-            <div className="last-refreshed-time">{this.state.lastRefreshed.toLocaleString()}</div>
-            <div onClick={this.refreshData} className="refresh-icon icon-sm" />
-            <div className="time-icon icon-sm" />
+        <ContextFilters disableDeviceFilter={(this.props.params || {}).id !== undefined}>
+          {this.state.showIndicator && <div className="spinner-container"><Spinner size="medium" pattern="bar" /></div>}
+          {pcsBtn({ // Change status button
+            svg: this.state.toggleButtonSvg,
+            onClick: this.showToggleRules,
+            value: this.state.toggleButtonText
+          }, showActionBtns && showContextBtns)}
+          {pcsBtn(this.contextButtons.edit, this.state.selectedRulesActions.length === 1 && showContextBtns)}
+          {pcsBtn(this.contextButtons.close, this.state.selectedAlarms.length > 0 && showContextBtns)}
+          {pcsBtn(this.contextButtons.acknowledge, this.state.selectedAlarms.length > 0 && showContextBtns)}
+          {this.state.contextBtns}
+          <ManageFilterBtn />
+        </ContextFilters>
+        <PageContent>
+          <div className="timerange-selection">
             <Select
               value={this.state.timerange}
               onChange={this.onTimeRangeChange}
@@ -403,20 +411,10 @@ class MaintenancePage extends Component {
                 }
               ]}
             />
+            <span className="last-refreshed-text"> {`${lang.LAST_REFRESHED} | `} </span>
+            <div className="last-refreshed-time">{this.state.lastRefreshed.toLocaleString()}</div>
+            <div onClick={this.refreshData} className="refresh-icon icon-sm" />
           </div>
-          {this.state.showIndicator && <div className="spinner-container"><Spinner size="medium" pattern="bar" /></div>}
-          {pcsBtn({ // Change status button
-            svg: this.state.toggleButtonSvg,
-            onClick: this.showToggleRules,
-            value: this.state.toggleButtonText
-          }, showActionBtns && showContextBtns)}
-          {pcsBtn(this.contextButtons.edit, this.state.selectedRulesActions.length === 1 && showContextBtns)}
-          {pcsBtn(this.contextButtons.close, this.state.selectedAlarms.length > 0 && showContextBtns)}
-          {pcsBtn(this.contextButtons.acknowledge, this.state.selectedAlarms.length > 0 && showContextBtns)}
-          {this.state.contextBtns}
-          <ManageFilterBtn />
-        </ContextFilters>
-        <PageContent>
           {React.cloneElement(this.props.children, {...alarmListProps})}
         </PageContent>
       </PageContainer>
@@ -432,9 +430,7 @@ const mapStateToProps = state => {
     alarmsGridData: state.maintenanceReducer.alarmsByRuleGridRowData,
     jobs: state.systemStatusJobReducer.jobs,
     jobsLoadingInProgress: state.systemStatusJobReducer.loadingInProgress,
-    selectedDevices: state.flyoutReducer.devices,
-    flyout: state.flyoutReducer,
-    modal: state.modalReducer
+    selectedDevices: state.flyoutReducer.devices
   };
 };
 

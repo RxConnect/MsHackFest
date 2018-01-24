@@ -58,7 +58,7 @@ class DeviceTagFlyout extends React.Component {
       commonTagTypes: [],
       showCreateFilter: false,
       jobApplied: false,
-      JobId: ''
+      jobId: ''
     };
     this.addNewTag = this.addNewTag.bind(this);
     this.deleteExistingTag = this.deleteExistingTag.bind(this);
@@ -153,12 +153,12 @@ class DeviceTagFlyout extends React.Component {
     const jobs = getRelatedJobs(devices, twinUpdateJobs);
     const deviceIdSet = new Set(devices.map(({Id}) => Id));
     Rx.Observable.from(jobs)
-      .flatMap(({ JobId, deviceIds }) =>
+      .flatMap(({ jobId, deviceIds }) =>
         Rx.Observable
-          .fromPromise(ApiService.getJobStatus(JobId))
+          .fromPromise(ApiService.getJobStatus(jobId))
           // Get completed jobs
           .filter(({ status }) => status === 3)
-          .do(_ => this.props.actions.removeTwinJob(JobId))
+          .do(_ => this.props.actions.removeTwinJob(jobId))
           .flatMap(_ => deviceIds)
       )
       .distinct()
@@ -196,7 +196,7 @@ class DeviceTagFlyout extends React.Component {
 
     this.setState({ newTags: [], overiddenDeviceTagValues }, () => this.computeState(this.props));
     const devices = _.cloneDeep(this.props.devices);
-    devices.forEach(device => (device.ETag = deviceETags[device.Id] ? deviceETags[device.Id] : device.ETag));
+    devices.forEach(device => (device.Etag = deviceETags[device.Id] ? deviceETags[device.Id] : device.Etag));
     this.props.actions.deviceListCommonTagsValueChanged(devices, overiddenDeviceTagValues);
   }
 
@@ -225,32 +225,32 @@ class DeviceTagFlyout extends React.Component {
     const { devices } = this.props;
     const { newTags, deletedTagNames, commonTagValues } = this.state;
     const deviceIds = devices.map(({ Id }) => `'${Id}'`).join(',');
-    const Tags = {
+    const tags = {
       ...commonTagValues,
       ...deletedTagNames,
     };
 
     newTags.forEach(tag => {
-      Tags[tag.name] = tag.value;
+      tags[tag.name] = tag.value;
     });
     const payload = {
       JobId: this.state.jobInputValue ? this.state.jobInputValue + '-' + uuid(): uuid(),
       QueryCondition: `deviceId in [${deviceIds}]`,
       MaxExecutionTimeInSeconds: 0,
-      UpdateTwin: {
-        Tags
+      updateTwin: {
+        tags
       }
     };
     this.setState({ showSpinner: true });
-    ApiService.scheduleJobs(payload).then(({ JobId }) => {
+    ApiService.scheduleJobs(payload).then(({ jobId }) => {
         this.props.actions.updateTwinJobs({
-          JobId,
+          jobId,
           deviceIds : devices.map(({ Id }) => Id)
         });
         this.setState({
           showSpinner: false,
           jobApplied: true,
-          JobId
+          jobId
         })
       }
     );
@@ -360,7 +360,7 @@ class DeviceTagFlyout extends React.Component {
 
   render() {
     const deepLinkSectionProps = {
-      path: `/maintenance/job/${this.state.JobId}`,
+      path: `/maintenance/job/${this.state.jobId}`,
       description: lang.VIEW_JOB_STATUS,
       linkText: lang.VIEW
     };

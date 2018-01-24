@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/WebApp/bin/Debug/netcoreapp2.0/Management.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/WebApp",
+            "cwd": "${workspaceFolder}/RxConnectSite",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
