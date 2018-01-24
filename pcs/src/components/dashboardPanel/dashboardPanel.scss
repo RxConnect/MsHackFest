@@ -9,6 +9,7 @@ $padding: 15px;
   color: #fff;
   margin-bottom: 16px;
   position: relative;
+  border: 3px solid white;
   
 
   .initial-loading {
@@ -31,7 +32,7 @@ $padding: 15px;
     flex-flow: row wrap;
     justify-content: space-between;
     align-items: center;
-    background-color: #242628;
+    background-color: white;
     padding: $padding;
     height: 48px; // TODO:  Remove when flex box work is done
 
@@ -42,7 +43,7 @@ $padding: 15px;
       .panel-header {
         flex-grow: 1;
         margin-right: 10px;
-        color: #fff;
+        color: orange;
       }
     }
 
