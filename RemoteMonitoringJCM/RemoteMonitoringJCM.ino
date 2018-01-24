@@ -75,7 +75,7 @@ Thread thread;
 void button_thread() {
     while (true) {
       doorcontrol();
-      thread.sleep(10);
+      delay(10);
     }
 }
 
