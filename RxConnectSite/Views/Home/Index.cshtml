@@ -19,7 +19,7 @@
     }
     connection.start()
             .then(function(){
-              connection.stream("StreamDoors","50").subscribe({
+                connection.stream("StreamDoors", "AZ3166_Alex").subscribe({
                     next: displayDoors,
                     error: function (err) {
                         logger.log(err);
