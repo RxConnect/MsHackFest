@@ -9,11 +9,16 @@ using Microsoft.Azure.Devices.Common;
 using System.Text;
 using System.Collections.Generic;
 using Microsoft.Azure.EventHubs;
+using System.Threading;
+using System.Collections;
 
 namespace WebApp.Hubs
 {
     public class Doors : Hub
     {
+        static PartitionReceiver eventHubReceiver = null;
+        static Dictionary<string, IObservable<DoorLog>> observers = new Dictionary<string, IObservable<DoorLog>>();
+
         public class DoorLog{
             public int ID {get;set;}
             public string State {get;set;}
@@ -22,9 +27,9 @@ namespace WebApp.Hubs
          ServiceClient _serviceClient;
          ILogger<Doors> _logger;
         string activeIoTHubConnectionString;
-        string consumerGroupName;
-        string ehConnectionString;
-        int eventHubPartitionsCount;
+        static string consumerGroupName;
+        static string ehConnectionString;
+        static int eventHubPartitionsCount;
 
         public Doors(IConfiguration configuration, ILogger<Doors> logger){
             _logger=logger;
@@ -47,52 +52,83 @@ namespace WebApp.Hubs
         }
         public IObservable<DoorLog> StreamDoors(string doorId)
         {
-            return Observable.Create(
-            async (IObserver<DoorLog> observer) =>
+            var w = getObserver(doorId);
+            w.Wait();
+            return w.Result;
+        }
+
+        private static async Task<IObservable<DoorLog>> getObserver(string doorId)
+        {
+            if (!observers.ContainsKey(doorId))
             {
-                PartitionReceiver eventHubReceiver = null;
+                await semaphore.WaitAsync();
                 try
                 {
-                    EventHubClient eventHubClient = EventHubClient.CreateFromConnectionString($"{ehConnectionString};EntityPath=jcmlabf7e9a");
-                    eventHubPartitionsCount = (await eventHubClient.GetRuntimeInformationAsync()).PartitionCount;
-                    string partition = EventHubPartitionKeyResolver.ResolveToPartition(doorId, eventHubPartitionsCount);
-                    eventHubReceiver = eventHubClient.CreateReceiver(consumerGroupName, partition, DateTime.Now);
-                    var events = await eventHubReceiver.ReceiveAsync(int.MaxValue, TimeSpan.FromSeconds(20));
-                    List<DoorLog> initialLog = new List<DoorLog>();
-                    if (events != null)
+                    if (!observers.ContainsKey(doorId))
                     {
-                        foreach (var eventData in events)
-                        {
-                            var data = getEvent(eventData, doorId);
-                            if (data != null)
+                        var doorLogger = Observable.Create(
+                            async (IObserver<DoorLog> observer) =>
                             {
-                                initialLog.Add(data);
-                            }
-                        }
-                    }
-                    observer.OnNext(new DoorLog { ID = 0, State = "value" });
-                    foreach (var d in initialLog)
-                    {
-                        observer.OnNext(d);
-                    }
-                    while (true)
-                    {
-                        var receivedEvents = await eventHubReceiver.ReceiveAsync(100, TimeSpan.FromSeconds(1));
-                        if (receivedEvents != null)
-                        {
-                            foreach (var eventData in receivedEvents)
-                            {
-                                var data = getEvent(eventData, doorId);
-                                observer.OnNext(data);
-                            }
-                        }
+                                var eventHubReceiver = await getReceiver(doorId);
+                                try
+                                {
+                                    var events = await eventHubReceiver.ReceiveAsync(int.MaxValue, TimeSpan.FromSeconds(20));
+                                    List<DoorLog> initialLog = new List<DoorLog>();
+                                    if (events != null)
+                                    {
+                                        foreach (var eventData in events)
+                                        {
+                                            var data = getEvent(eventData, doorId);
+                                            if (data != null)
+                                            {
+                                                initialLog.Add(data);
+                                            }
+                                        }
+                                    }
+                                    observer.OnNext(new DoorLog { ID = 0, State = "value" });
+                                    foreach (var d in initialLog)
+                                    {
+                                        observer.OnNext(d);
+                                    }
+                                    while (true)
+                                    {
+                                        var receivedEvents = await eventHubReceiver.ReceiveAsync(100, TimeSpan.FromSeconds(1));
+                                        if (receivedEvents != null)
+                                        {
+                                            foreach (var eventData in receivedEvents)
+                                            {
+                                                var data = getEvent(eventData, doorId);
+                                                if (data != null)
+                                                {
+                                                    observer.OnNext(data);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                    eventHubReceiver.Close();
+                                }
+                            });
+                        observers[doorId] = doorLogger;
                     }
                 }
-                catch (Exception ex)
+                finally
                 {
-                    _logger.LogError(ex.Message);
+                    semaphore.Release();
                 }
-            });
+            }
+            return observers[doorId];
+        }
+
+        static SemaphoreSlim semaphore = new SemaphoreSlim(1);
+        private static async Task<PartitionReceiver> getReceiver(string doorId)
+        {
+            EventHubClient eventHubClient = EventHubClient.CreateFromConnectionString($"{ehConnectionString};EntityPath=jcmlabf7e9a");
+            eventHubPartitionsCount = (await eventHubClient.GetRuntimeInformationAsync()).PartitionCount;
+            string partition = EventHubPartitionKeyResolver.ResolveToPartition(doorId, eventHubPartitionsCount);
+            return eventHubClient.CreateReceiver(consumerGroupName, partition, DateTime.Now);
         }
 
         static int counter = 0;
