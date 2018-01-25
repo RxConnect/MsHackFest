@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:OpenDoors_Xforms"
-             x:Class="OpenDoors_Xforms.MainPage">
+             x:Class="OpenDoors_Xforms.MainPage"
+             >
     <Grid>
         <Label Text="JCM-Door Opener" VerticalOptions="Start" HorizontalOptions="Center" />
         <Grid Margin="40,40,40,40">
@@ -13,6 +14,15 @@
         </Grid>
         <Grid Margin="40,120,40,40">
             <Button x:Name="btnClose" Text="Close" VerticalOptions="StartAndExpand"/>
+        </Grid>
+        <Grid Margin="40,160,40,40">
+            <Button x:Name="btnListen" Text="Listen" VerticalOptions="StartAndExpand"/>
+        </Grid>
+        <Grid Margin="40,200,40,40">
+            <Label x:Name="lblStatus" Text="...Waiting" VerticalOptions="StartAndExpand"/>
+        </Grid>
+        <Grid Margin="40,300,40,40">
+            <Label x:Name="lblData" TextColor="Azure" VerticalOptions="StartAndExpand"/>
         </Grid>
     </Grid>
 </ContentPage>

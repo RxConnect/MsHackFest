@@ -1,31 +1,29 @@
-﻿using Microsoft.AspNet.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace OpenDoors_Xforms
 {
 	public partial class App : Application
 	{
-        static HubConnection hubConnection = new HubConnection("http://localhost:63764/Hub");
-        public static IHubProxy mobileHubProxy = hubConnection.CreateHubProxy("RxHub");
-
+        public static HubConnection hubConnection;
 
         public App ()
 		{
 			InitializeComponent();
-            MainPage = new OpenDoors_Xforms.MainPage();
+            MainPage = new OpenDoors_Xforms.MainPage();            
 		}
 
-		protected override void OnStart ()
+		protected async override void OnStart ()
 		{
             try
             {
-                hubConnection.Start();
-                mobileHubProxy.Invoke("Send", new object[] { "RxDroidApp", "PepLluis" });
+                hubConnection = new HubConnectionBuilder().WithUrl("https://rxconnectsite-20180125102749.azurewebsites.net/doors").Build();
+                await hubConnection.StartAsync();
             }
             catch (Exception ex)
             {

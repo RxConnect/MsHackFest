@@ -1,29 +1,61 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+<div class="jumbotron"><h1>Real time device monitoring</h1></div>
 
-<div id="doorLog">
-
+<h4>Select a device</h4>
+<select id="selectId">
+    <option value="No select"></option>
+    <option value="AZ3166_Gil">Rx connect</option>
+    <option value="AZ3166">eKEE</option>
+    <option value="AZ3166_Alex">eBase</option>
+</select>
+<p style="height:5px"></p>
+<div id="doorLog" style="border:1px solid grey;background-color:white;color:#ffa400;padding-top: 20px; padding-bottom: 20px;border-radius:10px;box-shadow:10px 5px 5px grey;height:350px;overflow: scroll;">
+    
 </div>
+
 <script src="scripts/signalr-client.min.js"></script>
 <script lang="javascript">
-    let connection = new signalR.HubConnection('/doors');
+    $(document).ready(function () {
+        $("#selectId").attr('disabled', true);
 
-    connection.on('send', data => {
-        document.getElementById("doorLog").textContent = data;
-        console.log(data);
-    });
-
-    function displayDoors(door){
-        console.log(door);
-        document.getElementById("doorLog").textContent="ID: "+ door.id + " State: "+ door.state;
-    }
-    connection.start()
-            .then(function(){
-                connection.stream("StreamDoors", "AZ3166_Alex").subscribe({
-                    next: displayDoors,
-                    error: function (err) {
-                        logger.log(err);
-                    }});
+        let connection = new signalR.HubConnection('/doors');
+        connection.on('send', data => {
+            document.getElementById("doorLog").textContent = data;
+            console.log(data);
+        });
+        function displayDoors(door) {
+            if (door != null) {
+                $("#doorLog").append("<p style='margin-left: 20px;'>" + "TaskID: " + door.id.toString() + " State: " + door.state + "</p>");
+            }
+        }
+        connection.start()
+            .then(function () {
+                connected = true;
+                $("#selectId").attr('disabled', false);
             });
+        var current;
+        $("#selectId").change(function () {
+            $('#doorLog').html('');
+            if ($('#selectId').val() != "No select") {
+                var user = $('#selectId').val();
+                if (current != null) current.observers = [];
+                if (connected == true) {
+                    $("#doorLog").append("<p  style='margin-left: 20px;'>Waiting for connection...</p>");
+                    current = connection.stream("StreamDoors", user);
+                    current.subscribe({
+                        next: displayDoors,
+                        error: function (err) {
+                            logger.log(err);
+                        }
+                    });
+                } else {
+                    $('#doorLog').html('');
+                    $("#doorLog").append("<p  style='margin-left: 20px;'>please, choose a device</p>");
+                }
+            }
+        });
+    });
+  
 </script>

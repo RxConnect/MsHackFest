@@ -1,0 +1,31 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:63764/",
+      "sslPort": 44389
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:44389/",
+      "environmentVariables": {
+        "IoTHub:EventHubConnectionString": "Endpoint=sb://iothub-ns-jcmlabf7e9-327694-3fc2b55961.servicebus.windows.net/;SharedAccessKeyName=iothubowner;SharedAccessKey=J1NYbXvEX0dtWCUw/btI2N5QLgduTZcDQGst+nu7zb4=",
+        "IoTHub:ConnectionString": "HostName=jcmlabf7e9a.azure-devices.net;SharedAccessKeyName=webapp;SharedAccessKey=B+47D/gUI16goKOZ9ZJzlq/9EvnSl5Iqs4y8quIZ1Qk=",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "IoTHub:ConsumerGroup": "peplluis"
+      }
+    },
+    "RxConnectSite": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:63765/"
+    }
+  }
+}
