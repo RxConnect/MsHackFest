@@ -70,7 +70,6 @@ namespace WebApp.Hubs
                             }
                         }
                     }
-                    observer.OnNext(new DoorLog { ID = 0, State = "value" });
                     foreach (var d in initialLog)
                     {
                         observer.OnNext(d);
