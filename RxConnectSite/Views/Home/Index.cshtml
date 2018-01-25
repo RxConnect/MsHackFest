@@ -10,6 +10,7 @@
     let connection = new signalR.HubConnection('/doors');
 
     connection.on('send', data => {
+        document.getElementById("doorLog").textContent = data;
         console.log(data);
     });
 
