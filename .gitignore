@@ -260,5 +260,7 @@ paket-files/
 __pycache__/
 *.pyc
 
-RxConnectSite/Properties/launchSettings.json
-
+/.vscode/c_cpp_properties.json
+/RxConnectSite/Properties/launchSettings.json
+/RemoteMonitoringJCM/.build
+/RemoteMonitoringJCM/.vscode/c_cpp_properties.json
