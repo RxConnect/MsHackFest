@@ -12,27 +12,31 @@ namespace RxConnectSite.IoTHub
 {
     public class DoorsEventProcessor : IEventProcessor
     {
+        static int processorCount=0;
         private Action<DoorMessage> _onMessage;
 
         public DoorsEventProcessor(Action<DoorMessage> onMessage)
         {
+            System.Diagnostics.Trace.TraceInformation("New {0} nr {1}", nameof(DoorsEventProcessor), processorCount++);
             _onMessage = onMessage;
         }
 
         public Task CloseAsync(PartitionContext context, CloseReason reason)
         {
+            System.Diagnostics.Trace.TraceInformation("Close partition {0} for consumer group {1}. Owner {2}.", context.PartitionId, context.ConsumerGroupName, context.Owner);
             return Task.FromResult(false);
         }
 
         public Task OpenAsync(PartitionContext context)
         {
+            System.Diagnostics.Trace.TraceInformation("Open partition {0} for consumer group {1}. Owner {2}.", context.PartitionId, context.ConsumerGroupName, context.Owner);
             return Task.FromResult(false);
         }
 
         public Task ProcessErrorAsync(PartitionContext context, Exception error)
         {
+            System.Diagnostics.Trace.TraceError("Error in partition {0} for consumer group {1}. Owner {2}. Exception: {3}.", context.PartitionId, context.ConsumerGroupName, context.Owner, error.Message);
             //TODO: use logger and send error to observers
-            Console.WriteLine(error.ToString());
             return Task.FromResult(true);
         }
         int counter;
