@@ -2,7 +2,7 @@
     ViewData["Title"] = "Home Page";
 }
 <div class="jumbotron"><h1>Real time device monitoring</h1></div>
-
+<div id="serverId" style="visibility:collapse">@Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID")</div>
 <h4>Select a device</h4>
 <select id="selectId">
     <option value="No select"></option>
@@ -27,7 +27,7 @@
         });
         function displayDoors(door) {
             if (door != null) {
-                $("#doorLog").append("<p style='margin-left: 20px;'>" + "TaskID: " + door.id.toString() + " State: " + door.state + "</p>");
+                $("#doorLog").prepend("<p style='margin-left: 20px;'>" + "TaskID: " + door.id.toString() + " State: " + door.state + "</p>");
             }
         }
         connection.start()

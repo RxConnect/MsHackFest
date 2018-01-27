@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RxConnectSite.Hubs
+namespace RxConnectSite.Models
 {
     public class DoorMessage
     {

@@ -1,10 +1,11 @@
 ﻿using Microsoft.Azure.EventHubs.Processor;
+using RxConnectSite.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RxConnectSite.Hubs
+namespace RxConnectSite.IoTHub
 {
     public class DoorsEventProcessorFactory : IEventProcessorFactory
     {

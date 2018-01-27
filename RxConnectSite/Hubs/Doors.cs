@@ -11,11 +11,14 @@ using System.Collections.Generic;
 using Microsoft.Azure.EventHubs;
 using System.Threading;
 using System.Collections;
+using RxConnectSite.Models;
+using RxConnectSite.IoTHub;
 
 namespace RxConnectSite.Hubs
 {
     public class Doors : Hub
     {
+        static Dictionary<string, DoorsReporter> _reporters = new Dictionary<string, DoorsReporter>();
         ILogger<Doors> _logger;
         string activeIoTHubConnectionString;
         string consumerGroupName;
@@ -27,10 +30,30 @@ namespace RxConnectSite.Hubs
         public Doors(IConfiguration configuration, ILogger<Doors> logger){
             _logger=logger;
             hubName= configuration["IoTHub:Name"];
+            if (string.IsNullOrEmpty(hubName))
+            {
+                throw new ArgumentNullException("IoTHub:Name");
+            }
             activeIoTHubConnectionString = configuration["IoTHub:ConnectionString"];
+            if (string.IsNullOrEmpty(activeIoTHubConnectionString))
+            {
+                throw new ArgumentNullException("IoTHub:ConnectionString");
+            }
             consumerGroupName = configuration["IoTHub:ConsumerGroup"];
-            ehConnectionString=configuration["IoTHub:EventHubConnectionString"];
-            storageConnectionString= configuration["IoTHub:StorageConnectionString"];
+            if (string.IsNullOrEmpty(consumerGroupName))
+            {
+                throw new ArgumentNullException("IoTHub:ConsumerGroup");
+            }
+            ehConnectionString =configuration["IoTHub:EventHubConnectionString"];
+            if (string.IsNullOrEmpty(ehConnectionString))
+            {
+                throw new ArgumentNullException("IoTHub:EventHubConnectionString");
+            }
+            storageConnectionString = configuration["IoTHub:StorageConnectionString"];
+            if (string.IsNullOrEmpty(storageConnectionString))
+            {
+                throw new ArgumentNullException("IoTHub:StorageConnectionString");
+            }
         }
 
         public Task Send(string message)
@@ -40,14 +63,14 @@ namespace RxConnectSite.Hubs
         public IObservable<DoorMessage> StreamDoors(string doorId)
         {
             createListener().Wait();
-            if (!observables.ContainsKey(doorId))
+            if (!_reporters.ContainsKey(doorId))
             {
                 factorySemaphore.Wait();
                 try
                 {
-                    if (!observables.ContainsKey(doorId))
+                    if (!_reporters.ContainsKey(doorId))
                     {
-                        observables.Add(doorId, new DoorsObservable(doorId));
+                        _reporters.Add(doorId, new DoorsReporter(doorId));
                     }
                 }
                 finally
@@ -55,12 +78,12 @@ namespace RxConnectSite.Hubs
                     factorySemaphore.Release();
                 }
             }
-            return observables[doorId];
+            return _reporters[doorId];
         }
 
-        static Dictionary<string, DoorsObservable> observables = new Dictionary<string, DoorsObservable>();
         static DoorsEventProcessorFactory factory;
         static SemaphoreSlim factorySemaphore = new SemaphoreSlim(1);
+
         private async Task createListener()
         {
             try
@@ -72,14 +95,24 @@ namespace RxConnectSite.Hubs
                     {
                         if (factory == null)
                         {
+                            var webId = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
+                            if (string.IsNullOrEmpty(webId))
+                            {
+                                webId = Guid.NewGuid().ToString("N");
+                            }
+
+                            //max leaseId length is 63
+                            if(webId.Length>60)
+                                webId = webId.Substring(0, 60);
+
                             factory = new DoorsEventProcessorFactory((message) =>
                             {
-                                foreach (var door in observables.Keys)
+                                foreach (var door in _reporters.Keys)
                                 {
-                                    observables[door].OnMessage(message);
+                                    _reporters[door].OnMessage(message);
                                 }
                             });
-                            await DoorsEventProcessor.AttachProcessorForHub("webapp", ehConnectionString, storageConnectionString, hubName,
+                            await DoorsEventProcessor.AttachProcessorForHub(webId, ehConnectionString, storageConnectionString, hubName,
                                 consumerGroupName, factory);
                         }
                     }
@@ -94,86 +127,5 @@ namespace RxConnectSite.Hubs
                 _logger.LogError(ex.Message);
             }
         }
-
-        //static async Task<IObservable<EventData>> getPartitionObserver(string doorId)
-        //{
-        //    var eventHubReceiver = await getReceiver(doorId);
-        //    if(!partitionObservers.ContainsKey(eventHubReceiver.PartitionId))
-        //    {
-        //        partitionObservers[eventHubReceiver.PartitionId]= Observable.Create(async (IObserver<EventData> observer)=>
-        //        {
-        //            while (true)
-        //            {
-        //                var receivedEvents = await eventHubReceiver.ReceiveAsync(100, TimeSpan.FromSeconds(1));
-        //                if (receivedEvents != null)
-        //                {
-        //                    foreach (var eventData in receivedEvents)
-        //                    {
-        //                        observer.OnNext(eventData);
-        //                    }
-        //                }
-        //            }
-        //        });
-        //    }
-        //    return partitionObservers[eventHubReceiver.PartitionId];
-        //}
-
-        //private static async Task<IObservable<DoorMessage>> getObserver(string doorId)
-        //{
-        //    if (!observers.ContainsKey(doorId))
-        //    {
-        //        await semaphore.WaitAsync();
-        //        try
-        //        {
-        //            if (!observers.ContainsKey(doorId))
-        //            {
-        //                var partobs = await getPartitionObserver(doorId);
-        //                using(var a = partobs.Subscribe(data =>
-        //                {
-
-        //                }))
-
-        //                var doorObserver = Observable.Create(
-        //                     (IObserver<DoorMessage> observer) =>
-        //                    {
-        //                        partobs.
-        //                        partobs.Subscribe(eventData => {
-        //                                var data = getEvent(eventData, doorId);
-        //                                if (data != null)
-        //                                {
-        //                                    observer.OnNext(data);
-        //                                }
-
-        //                        });
-        //                    });
-        //                observers.Add(doorId, doorObserver);
-        //            }
-        //            return observers[doorId];
-        //        }
-        //        finally
-        //        {
-        //            semaphore.Release();
-        //        }
-        //    }
-        //    return observers[doorId];
-        //}
-
-        //static SemaphoreSlim semaphore = new SemaphoreSlim(1);
-        //static EventHubClient eventHubClient;
-        //private static async Task<PartitionReceiver> getReceiver(string doorId)
-        //{
-        //    if (eventHubClient == null)
-        //    {
-        //        eventHubClient = EventHubClient.CreateFromConnectionString($"{ehConnectionString};EntityPath=jcmlabf7e9a");
-        //    }
-        //    eventHubPartitionsCount = (await eventHubClient.GetRuntimeInformationAsync()).PartitionCount;
-        //    string partition = EventHubPartitionKeyResolver.ResolveToPartition(doorId, eventHubPartitionsCount);
-        //    if (!eventHubReceivers.ContainsKey(partition))
-        //    {
-        //        eventHubReceivers.Add(partition, eventHubClient.CreateReceiver(consumerGroupName, partition, DateTime.Now));
-        //    }
-        //    return eventHubReceivers[partition];
-        //}
-
     }
 }

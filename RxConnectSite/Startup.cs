@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RxConnectSite.Data;
 using RxConnectSite.Models;
 using RxConnectSite.Services;
+using RxConnectSite.IoTHub;
 using RxConnectSite.Hubs;
 
 namespace RxConnectSite

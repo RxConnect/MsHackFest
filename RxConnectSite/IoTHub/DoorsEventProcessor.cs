@@ -1,21 +1,22 @@
 ﻿using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using Microsoft.Extensions.DependencyInjection;
+using RxConnectSite.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RxConnectSite.Hubs
+namespace RxConnectSite.IoTHub
 {
     public class DoorsEventProcessor : IEventProcessor
     {
-        private Action<DoorMessage> onItem;
+        private Action<DoorMessage> _onMessage;
 
-        public DoorsEventProcessor(Action<DoorMessage> onItem)
+        public DoorsEventProcessor(Action<DoorMessage> onMessage)
         {
-            this.onItem = onItem;
+            _onMessage = onMessage;
         }
 
         public Task CloseAsync(PartitionContext context, CloseReason reason)
@@ -30,7 +31,7 @@ namespace RxConnectSite.Hubs
 
         public Task ProcessErrorAsync(PartitionContext context, Exception error)
         {
-            //TODO: use logger
+            //TODO: use logger and send error to observers
             Console.WriteLine(error.ToString());
             return Task.FromResult(true);
         }
@@ -43,8 +44,8 @@ namespace RxConnectSite.Hubs
                 if (DateTime.UtcNow - message.SystemProperties.EnqueuedTimeUtc < TimeSpan.FromSeconds(20))
                 {
                     var data = Encoding.UTF8.GetString(message.Body.ToArray());
-                    var connectionDeviceId = message.Properties["iothub-connection-device-id"].ToString();
-                    this.onItem(new DoorMessage { Id = message.SystemProperties.SequenceNumber, State = data, DoorId = connectionDeviceId, Enqueued = message.SystemProperties.EnqueuedTimeUtc });
+                    var deviceId = message.Properties["iothub-connection-device-id"].ToString();
+                    this._onMessage(new DoorMessage { Id = message.SystemProperties.SequenceNumber, State = data, DoorId = deviceId, Enqueued = message.SystemProperties.EnqueuedTimeUtc });
                 }
             }
             if (counter++ % 50 == 0)
